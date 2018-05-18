@@ -82,6 +82,32 @@ class Enemy extends GameCharacter {
         super (X, Y, moveSpeed)
       }
 
+      movementHandler ()
+      {
+        this.move ();
+      }
+
+      move ()
+      {
+        if ((hero.X - this.X) > 0)
+        {
+          this.X += .75;
+        }
+        else
+        {
+          this.X -= .75;
+        }
+        if ((hero.Y - this.Y) > 0)
+        {
+          this.Y += .75;
+        }
+        else
+        {
+          this.Y -= .75;
+        }
+
+      }
+
 
 }
 
@@ -180,5 +206,6 @@ window.onload = function ()
 {
     draw ();
     var framesPerSecond = 60;
-    setInterval (function () { draw (); hero.move (), bullet.manageBullet () }, 1000/framesPerSecond);
+    setInterval (function () { draw (); hero.move (), enemy.movementHandler (),
+      bullet.manageBullet () }, 1000/framesPerSecond);
 }
