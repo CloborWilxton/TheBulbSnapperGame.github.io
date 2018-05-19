@@ -28,7 +28,7 @@ class Hero extends GameCharacter {
       move ()
       {
 
-          console.log(this.X + " " + this.Y);
+          console.log("HERO: " + this.X + " " + this.Y);
 
           this.moveX ();
           this.moveY ();
@@ -86,10 +86,12 @@ class Enemy extends GameCharacter {
       movementHandler ()
       {
         this.move ();
+        this.checkForOverlap ();
       }
 
       move ()
       {
+        console.log("ENEMY: " + this.X + " " + this.Y);
         if ((hero.X - this.X) > 0)
         {
           this.X += this.moveSpeed;
@@ -106,10 +108,31 @@ class Enemy extends GameCharacter {
         {
           this.Y -= this.moveSpeed;
         }
-
       }
 
+      checkForOverlap ()
+      {
+        if (this.checkForOverlapX () && this.checkForOverlapY ())
+        {
+          hero.health -= 1;
+        }
+      }
 
+      checkForOverlapX ()
+      {
+        if ((enemy.X + 32) > hero.X && (enemy.X + 32) < (hero.X + 32) || (hero.X + 32) > enemy.X && (hero.X + 32) < (enemy.X + 32) )
+        {
+          return true
+        }
+      }
+
+      checkForOverlapY ()
+      {
+        if ((enemy.Y + 32) > hero.Y && (enemy.Y + 32) < (hero.Y + 32) || (hero.Y + 32) > enemy.Y && (hero.Y + 32) < (enemy.Y + 32) )
+        {
+          return true
+        }
+      }
 }
 
 class Bullet {
@@ -167,7 +190,7 @@ class Bullet {
 }
 
 var canvas = document.getElementById("gameCanvas");
-var hero = new Hero (234, 234, 2, 100);
+var hero = new Hero (234, 234, 2, 500);
 console.log (hero.health);
 var enemy = new Enemy (100, 100, .75, 50);
 var bullet = new Bullet ();
@@ -185,7 +208,6 @@ function draw ()
         c.fillRect(bullet.X, bullet.Y, bullet.width, bullet.height);
     }
 
-    console.log("Canvas Drawn")
 }
 
 function drawBasics (c)
