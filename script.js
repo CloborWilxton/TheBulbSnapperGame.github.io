@@ -7,21 +7,22 @@ var textPos1 = 10;
 
 // for Hero X = 234, y = 234, moveSpeed = 2, movementY = 0, movementX = 0
 class GameCharacter {
-    constructor (X, Y, moveSpeed)
+    constructor (X, Y, moveSpeed, health)
     {
     this.X = X;
     this.Y = Y;
     this.moveSpeed = moveSpeed;
     this.movementX = 0;
     this.movementY = 0;
+    this.health = health;
     }
 }
 
 
 class Hero extends GameCharacter {
-      constructor (X, Y, moveSpeed)
+      constructor (X, Y, moveSpeed, health)
       {
-        super (X, Y, moveSpeed)
+        super (X, Y, moveSpeed, health)
       }
 
       move ()
@@ -77,9 +78,9 @@ class Hero extends GameCharacter {
 
 class Enemy extends GameCharacter {
 
-      constructor (X, Y, moveSpeed)
+      constructor (X, Y, moveSpeed, health)
       {
-        super (X, Y, moveSpeed)
+        super (X, Y, moveSpeed, health)
       }
 
       movementHandler ()
@@ -91,19 +92,19 @@ class Enemy extends GameCharacter {
       {
         if ((hero.X - this.X) > 0)
         {
-          this.X += .75;
+          this.X += this.moveSpeed;
         }
         else
         {
-          this.X -= .75;
+          this.X -= this.moveSpeed;
         }
         if ((hero.Y - this.Y) > 0)
         {
-          this.Y += .75;
+          this.Y += this.moveSpeed;
         }
         else
         {
-          this.Y -= .75;
+          this.Y -= this.moveSpeed;
         }
 
       }
@@ -166,8 +167,9 @@ class Bullet {
 }
 
 var canvas = document.getElementById("gameCanvas");
-var hero = new Hero (234, 234, 2, 'Assets/hero.png');
-var enemy = new Enemy (100, 100, 4);
+var hero = new Hero (234, 234, 2, 100);
+console.log (hero.health);
+var enemy = new Enemy (100, 100, .75, 50);
 var bullet = new Bullet ();
 
 function draw ()
@@ -195,6 +197,8 @@ function drawBasics (c)
     c.font = "16px Arial";
     c.fillStyle = "yellow";
     c.fillText("WASD to move and right arrow key to shoot!", textPos1, 50);
+    c.fillText(hero.health, hero.X, hero.Y);
+    c.fillText(" " + enemy.health, enemy.X, enemy.Y);
 }
 
 onkeydown = onkeyup = function(e){
