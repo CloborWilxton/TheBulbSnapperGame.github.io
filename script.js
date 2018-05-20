@@ -80,33 +80,48 @@ class Enemy extends GameCharacter {
 
       constructor (X, Y, moveSpeed, health)
       {
-        super (X, Y, moveSpeed, health)
+        super (X, Y, moveSpeed, health);
+        this.isCharging = false;
+        this.timeElapsed = performance.now ();
       }
 
       movementHandler ()
       {
-        this.move ();
+        if ((performance.now () - this.timeElapsed) > 5000)
+        {
+          this.timeElapsed = performance.now ()
+          this.changeCharging ();
+        }
+        if (this.isCharging == true)
+        {
+          this.move (3);
+        }
+        else
+        {
+          this.move (0);
+        }
         this.checkForOverlap ();
       }
 
-      move ()
+      move (movementModifier)
       {
+        var movement = this.moveSpeed + movementModifier;
         console.log("ENEMY: " + this.X + " " + this.Y);
         if ((hero.X - this.X) > 0)
         {
-          this.X += this.moveSpeed;
+          this.X += movement;
         }
         else
         {
-          this.X -= this.moveSpeed;
+          this.X -= movement;
         }
         if ((hero.Y - this.Y) > 0)
         {
-          this.Y += this.moveSpeed;
+          this.Y += movement;
         }
         else
         {
-          this.Y -= this.moveSpeed;
+          this.Y -= movement;
         }
       }
 
@@ -132,6 +147,12 @@ class Enemy extends GameCharacter {
         {
           return true
         }
+      }
+
+      changeCharging ()
+      {
+        console.log ("CHANGED");
+        this.isCharging = (!this.isCharging);
       }
 }
 
@@ -199,13 +220,21 @@ function draw ()
 {
     var c = canvas.getContext("2d");
     drawBasics (c);
+    if (hero.health <= 0)
+    {
+      c.fillText ("GAME OVER REFRESH BROWSER TO RESTART", 0, 250);
+    }
+    else {
     c.drawImage(heroImage, hero.X, hero.Y);
     c.drawImage(enemyImage, enemy.X, enemy.Y);
-
-    if (bullet.shotFired == true)
-    {
-        c.fillStyle = "orange";
-        c.fillRect(bullet.X, bullet.Y, bullet.width, bullet.height);
+    c.fillStyle = "yellow;"
+    c.fillText(hero.health, hero.X, hero.Y);
+    c.fillText(" " + enemy.health, enemy.X, enemy.Y);
+      if (bullet.shotFired == true)
+      {
+          c.fillStyle = "orange";
+          c.fillRect(bullet.X, bullet.Y, bullet.width, bullet.height);
+      }
     }
 
 }
@@ -219,8 +248,6 @@ function drawBasics (c)
     c.font = "16px Arial";
     c.fillStyle = "yellow";
     c.fillText("WASD to move and right arrow key to shoot!", textPos1, 50);
-    c.fillText(hero.health, hero.X, hero.Y);
-    c.fillText(" " + enemy.health, enemy.X, enemy.Y);
 }
 
 onkeydown = onkeyup = function(e){
@@ -232,6 +259,6 @@ window.onload = function ()
 {
     draw ();
     var framesPerSecond = 60;
-    setInterval (function () { draw (); hero.move (), enemy.movementHandler (),
+    setInterval (function () { draw (), hero.move (), enemy.movementHandler (),
       bullet.manageBullet () }, 1000/framesPerSecond);
 }
