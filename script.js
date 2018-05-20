@@ -87,7 +87,12 @@ class Enemy extends GameCharacter {
 
       movementHandler ()
       {
-        if ((performance.now () - this.timeElapsed) > 5000)
+        if (this.isCharging == false && (performance.now () - this.timeElapsed) > 5000)
+        {
+          this.timeElapsed = performance.now ()
+          this.changeCharging ();
+        }
+        else if (this.isCharging == true && (performance.now () - this.timeElapsed) > 500)
         {
           this.timeElapsed = performance.now ()
           this.changeCharging ();
