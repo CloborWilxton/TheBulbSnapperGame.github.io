@@ -106,6 +106,7 @@ class Enemy extends GameCharacter {
           this.move (0);
         }
         this.checkForOverlap ();
+        this.takeDamage ();
       }
 
       move (movementModifier)
@@ -154,6 +155,30 @@ class Enemy extends GameCharacter {
         }
       }
 
+      takeDamage ()
+      {
+        if (this.checkForBulletOverlapX () && this.checkForBulletOverlapY ())
+        {
+          this.health -= 1;
+        }
+      }
+
+      checkForBulletOverlapX ()
+      {
+        if ((bullet.X + 16) > enemy.X && (bullet.X + 16) < (enemy.X + 32) || (enemy.X + 32) > bullet.X && (enemy.X + 32) < (bullet.X + 32) )
+        {
+          return true
+        }
+      }
+
+      checkForBulletOverlapY ()
+      {
+        if ((bullet.Y + 16) > enemy.Y && (bullet.Y + 16) < (enemy.Y + 32) || (enemy.Y + 32) > bullet.Y && (enemy.Y + 32) < (bullet.Y + 32) )
+        {
+          return true
+        }
+      }
+
       changeCharging ()
       {
         console.log ("CHANGED");
@@ -165,8 +190,8 @@ class Bullet {
 
     constructor ()
     {
-    this.X = 100;
-    this.Y = 100;
+    this.X;
+    this.Y;
     this.moveSpeed = 4;
     this.height = 16;
     this.width = 16;
@@ -206,6 +231,11 @@ class Bullet {
             this.X += (this.moveSpeed * this.shotDirectionX);
             this.Y += (this.moveSpeed * this.shotDirectionY);
         }
+        else
+        {
+          this.X = undefined;
+          this.Y = undefined;
+        }
     }
 
     manageBullet ()
@@ -215,14 +245,22 @@ class Bullet {
     }
 }
 
-var canvas = document.getElementById("gameCanvas");
-var hero = new Hero (234, 234, 2, 500);
-console.log (hero.health);
-var enemy = new Enemy (100, 100, .75, 50);
-var bullet = new Bullet ();
+var canvas;
+var hero;
+var enemy;
+var bullet;
+
+function initializeData ()
+{
+  canvas = document.getElementById("gameCanvas");
+  hero = new Hero (234, 234, 2, 500);
+  enemy = new Enemy (100, 100, .75, 50);
+  bullet = new Bullet ();
+}
 
 function draw ()
 {
+    console.log (bullet.X + " " + bullet.Y);
     var c = canvas.getContext("2d");
     drawBasics (c);
     if (hero.health <= 0)
@@ -262,8 +300,9 @@ onkeydown = onkeyup = function(e){
 
 window.onload = function ()
 {
+    initializeData ();
     draw ();
     var framesPerSecond = 60;
-    setInterval (function () { draw (), hero.move (), enemy.movementHandler (),
-      bullet.manageBullet () }, 1000/framesPerSecond);
+    setInterval (function () { draw (), hero.move (), bullet.manageBullet (),
+      enemy.movementHandler () }, 1000/framesPerSecond);
 }
