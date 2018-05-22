@@ -28,7 +28,7 @@ class Hero extends GameCharacter {
       move ()
       {
 
-          console.log("HERO: " + this.X + " " + this.Y);
+          //console.log("HERO: " + this.X + " " + this.Y);
 
           this.moveX ();
           this.moveY ();
@@ -105,14 +105,14 @@ class Enemy extends GameCharacter {
         {
           this.move (0);
         }
-        this.checkForOverlap ();
-        this.takeDamage ();
+        /*this.checkForOverlap ();
+        this.takeDamage ();*/
       }
 
       move (movementModifier)
       {
         var movement = this.moveSpeed + movementModifier;
-        console.log("ENEMY: " + this.X + " " + this.Y);
+        //console.log("ENEMY: " + this.X + " " + this.Y);
         if ((hero.X - this.X) > 0)
         {
           this.X += movement;
@@ -131,49 +131,49 @@ class Enemy extends GameCharacter {
         }
       }
 
-      checkForOverlap ()
+      checkForOverlap (arrayIndex)
       {
-        if (this.checkForOverlapX () && this.checkForOverlapY ())
+        if (this.checkForOverlapX (arrayIndex) && this.checkForOverlapY (arrayIndex))
         {
           hero.health -= 1;
         }
       }
 
-      checkForOverlapX ()
+      checkForOverlapX (arrayIndex)
       {
-        if ((enemy.X + 32) > hero.X && (enemy.X + 32) < (hero.X + 32) || (hero.X + 32) > enemy.X && (hero.X + 32) < (enemy.X + 32) )
+        if ((enemyArray[arrayIndex].X + 32) > hero.X && (enemyArray[arrayIndex].X + 32) < (hero.X + 32) || (hero.X + 32) > enemyArray[arrayIndex].X && (hero.X + 32) < (enemyArray[arrayIndex].X + 32) )
         {
           return true
         }
       }
 
-      checkForOverlapY ()
+      checkForOverlapY (arrayIndex)
       {
-        if ((enemy.Y + 32) > hero.Y && (enemy.Y + 32) < (hero.Y + 32) || (hero.Y + 32) > enemy.Y && (hero.Y + 32) < (enemy.Y + 32) )
+        if ((enemyArray[arrayIndex].Y + 32) > hero.Y && (enemyArray[arrayIndex].Y + 32) < (hero.Y + 32) || (hero.Y + 32) > enemyArray[arrayIndex].Y && (hero.Y + 32) < (enemyArray[arrayIndex].Y + 32) )
         {
           return true
         }
       }
 
-      takeDamage ()
+      takeDamage (arrayIndex)
       {
-        if (this.checkForBulletOverlapX () && this.checkForBulletOverlapY ())
+        if (this.checkForBulletOverlapX (arrayIndex) && this.checkForBulletOverlapY (arrayIndex))
         {
           this.health -= 1;
         }
       }
 
-      checkForBulletOverlapX ()
+      checkForBulletOverlapX (arrayIndex)
       {
-        if ((bullet.X + 16) > enemy.X && (bullet.X + 16) < (enemy.X + 32) || (enemy.X + 32) > bullet.X && (enemy.X + 32) < (bullet.X + 32) )
+        if ((bullet.X + 16) > enemyArray[arrayIndex].X && (bullet.X + 16) < (enemyArray[arrayIndex].X + 32) || (enemyArray[arrayIndex].X + 32) > bullet.X && (enemyArray[arrayIndex].X + 32) < (bullet.X + 32) )
         {
           return true
         }
       }
 
-      checkForBulletOverlapY ()
+      checkForBulletOverlapY (arrayIndex)
       {
-        if ((bullet.Y + 16) > enemy.Y && (bullet.Y + 16) < (enemy.Y + 32) || (enemy.Y + 32) > bullet.Y && (enemy.Y + 32) < (bullet.Y + 32) )
+        if ((bullet.Y + 16) > enemyArray[arrayIndex].Y && (bullet.Y + 16) < (enemyArray[arrayIndex].Y + 32) || (enemyArray[arrayIndex].Y + 32) > bullet.Y && (enemyArray[arrayIndex].Y + 32) < (bullet.Y + 32) )
         {
           return true
         }
@@ -248,6 +248,11 @@ class Bullet {
 var canvas;
 var hero;
 var enemy;
+var enemyArray = new Array ();
+enemyArray.push(new Enemy (100, 100, .75, 50));
+enemyArray.push(new Enemy (300, 150, 1.25, 50));
+console.log (enemyArray.length);
+console.log(enemyArray[0].health);
 var bullet;
 
 function initializeData ()
@@ -258,9 +263,20 @@ function initializeData ()
   bullet = new Bullet ();
 }
 
+function moveEnemies ()
+{
+  for (var i = 0; i < enemyArray.length; i ++)
+  {
+    enemyArray[i].movementHandler ();
+    console.log (enemyArray[i].health);
+    enemyArray[i].checkForOverlap (i);
+    enemyArray[i].takeDamage (i);
+  }
+}
+
 function draw ()
 {
-    console.log (bullet.X + " " + bullet.Y);
+    //console.log (bullet.X + " " + bullet.Y);
     var c = canvas.getContext("2d");
     drawBasics (c);
     if (hero.health <= 0)
@@ -269,10 +285,12 @@ function draw ()
     }
     else {
     c.drawImage(heroImage, hero.X, hero.Y);
-    c.drawImage(enemyImage, enemy.X, enemy.Y);
+    for (var i = 0; i < enemyArray.length; i ++){
+    c.drawImage(enemyImage, enemyArray[i].X, enemyArray[i].Y);
+    c.fillText(" " + enemyArray[i].health, enemyArray[i].X, enemyArray[i].Y);
+  }
     c.fillStyle = "yellow;"
     c.fillText(hero.health, hero.X, hero.Y);
-    c.fillText(" " + enemy.health, enemy.X, enemy.Y);
       if (bullet.shotFired == true)
       {
           c.fillStyle = "orange";
@@ -304,5 +322,5 @@ window.onload = function ()
     draw ();
     var framesPerSecond = 60;
     setInterval (function () { draw (), hero.move (), bullet.manageBullet (),
-      enemy.movementHandler () }, 1000/framesPerSecond);
+      moveEnemies () }, 1000/framesPerSecond);
 }

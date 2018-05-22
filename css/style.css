@@ -13,4 +13,5 @@ h1 {
 
 body {
     background-image: url(../Assets/background.jpg);
+    overflow-x: hidden;
 }
