@@ -247,20 +247,61 @@ class Bullet {
 
 var canvas;
 var hero;
-var enemy;
 var enemyArray = new Array ();
-enemyArray.push(new Enemy (100, 100, .75, 50));
-enemyArray.push(new Enemy (300, 150, 1.25, 50));
-console.log (enemyArray.length);
-console.log(enemyArray[0].health);
 var bullet;
+var roundNumber = 1;
 
 function initializeData ()
 {
   canvas = document.getElementById("gameCanvas");
   hero = new Hero (234, 234, 2, 500);
-  enemy = new Enemy (100, 100, .75, 50);
+  enemyArray.push(new Enemy (100, 100, .75, 50));
+  enemyArray.push(new Enemy (300, 150, 1.25, 50));
   bullet = new Bullet ();
+}
+
+function removeDeadEnemies ()
+{
+  for (var i = 0; i < enemyArray.length; i ++)
+  {
+    if (enemyArray[i].health <= 0)
+    {
+    enemyArray[i].X = undefined;
+    enemyArray[i].Y = undefined;
+    }
+  }
+}
+
+function enemiesAlive ()
+{
+  var enemiesLeft;
+
+  for (var i = 0; i < enemyArray.length; i ++)
+  {
+    if (enemyArray[i].health > 0)
+    {
+      return true;
+    }
+  }
+  return false;
+}
+
+function spawnEnemies ()
+{
+  if (enemiesAlive () == false)
+  {
+    roundNumber ++;
+
+    for (var i = 0; i < roundNumber + 2; i ++)
+    {
+      var X = (Math.random () * canvas.width);
+      var Y = (Math.random () * canvas.height);
+        if (enemyArray[i] != undefined)
+        {
+          enemyArray[i] = new Enemy (X, Y, 1, 75);
+        }
+    }
+  }
 }
 
 function moveEnemies ()
@@ -309,6 +350,11 @@ function drawBasics (c)
     c.font = "16px Arial";
     c.fillStyle = "yellow";
     c.fillText("WASD to move and right arrow key to shoot!", textPos1, 50);
+    c.font = "32px Arial";
+    c.textAlign = "center";
+    c.fillText("Round : " + roundNumber, 350, 250);
+    c.textAlign = "left";
+    c.font = "16px Arial";
 }
 
 onkeydown = onkeyup = function(e){
@@ -322,5 +368,5 @@ window.onload = function ()
     draw ();
     var framesPerSecond = 60;
     setInterval (function () { draw (), hero.move (), bullet.manageBullet (),
-      moveEnemies () }, 1000/framesPerSecond);
+      moveEnemies (), removeDeadEnemies (), spawnEnemies () }, 1000/framesPerSecond);
 }
